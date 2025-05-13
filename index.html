@@ -1,12 +1,129 @@
-<html>
-    <head>
-        <title>Nūr Creative</title>
-    </head>
-    <body>
-        <center>
-            <br><br>
-            <h3>Nūr Creative</h3>
-            <h2>Hello World!</h2>
-        <p>Coming Really Soon.</p></center>
-    </body>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Nūr Creative</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: black;
+      overflow: hidden;
+      font-family: sans-serif;
+      color: white;
+    }
+
+    #universe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .overlay {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding-top: 4vh;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+    }
+
+    h1 {
+      font-size: 3rem;
+      color: #FFCC00;
+    }
+
+    p {
+      color: #ccc;
+      font-size: 1.2rem;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<canvas id="universe"></canvas>
+
+<div class="overlay">
+  <h1>Nūr Creative</h1>
+  <p>Menyalakan ide, membentuk masa depan</p>
+<p><a href="mailto:nurcreative@outlook.com">nurcreative@outlook.com</a></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script>
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 20;
+
+  const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('universe'), antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+
+  // Matahari
+  const sunGeometry = new THREE.SphereGeometry(2.5, 64, 64);
+  const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffcc00 });
+  const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+  scene.add(sun);
+
+  // Light glow
+  const pointLight = new THREE.PointLight(0xffaa00, 2, 100);
+  pointLight.position.set(0, 0, 0);
+  scene.add(pointLight);
+
+  // Planet orbit group
+  const planets = [];
+  const orbits = [];
+
+  for (let i = 1; i <= 5; i++) {
+    const group = new THREE.Group();
+    const geometry = new THREE.SphereGeometry(0.3 + Math.random() * 0.2, 32, 32);
+    const material = new THREE.MeshStandardMaterial({ color: 0x2b3a67 });
+    const planet = new THREE.Mesh(geometry, material);
+    planet.position.x = i * 4;
+    group.add(planet);
+    scene.add(group);
+    planets.push(planet);
+    orbits.push(group);
+  }
+
+  // Stars background
+  const starGeometry = new THREE.BufferGeometry();
+  const starCount = 1000;
+  const starPositions = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount * 3; i++) {
+    starPositions[i] = (Math.random() - 0.5) * 100;
+  }
+  starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+  const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.4 });
+  const stars = new THREE.Points(starGeometry, starMaterial);
+  scene.add(stars);
+
+  // Responsive
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // Animation
+  function animate() {
+    requestAnimationFrame(animate);
+    stars.rotation.y += 0.0005;
+    sun.rotation.y += 0.001;
+
+    orbits.forEach((orbit, i) => {
+      orbit.rotation.y += 0.001 + i * 0.0005;
+    });
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+</script>
+
+</body>
 </html>
